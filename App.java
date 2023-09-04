@@ -2,29 +2,21 @@ import java.util.Random;
 
 public class App {
     public static void main(String[] args) throws Exception {
-        long t0;
-        long t1;
         int arraySize = 10;
-        Random rnd = new Random();
-        int key = rnd.nextInt(120) + 1;
-        int[] array = sorted(arraySize);
+        for (int i = 0; i < 3; i++) {
 
-        System.out.println("Current Key :" + key);
-        System.out.println("Current Size :" + arraySize);
-
-        t0 = System.nanoTime();
-        binary_search_sorted(array, key);
-        t1 = System.nanoTime();
-        System.out.println(" Binary search array Size :" + arraySize + "| Time In ns: " + (t1 - t0));
-
-        // benchmarkSortedUnsortedArraySize();
+            for (int j = 0; j < 1000; j++) {
+                
+        benchmarkSortedUnsortedArraySize(arraySize);
+        benchmarkFindDuplicates(arraySize);
+            }
+        arraySize*=10;
+        }
     }
 
-    public static void benchmarkSortedUnsortedArraySize() {
-
-        int arraySize = 10;
+    public static void benchmarkSortedUnsortedArraySize(int arraySize) {
         Random rnd = new Random();
-        int key = rnd.nextInt(120) + 1;
+        int key = rnd.nextInt(5*arraySize) + 1;
 
         System.out.println("Current Key :" + key);
 
@@ -32,23 +24,48 @@ public class App {
         int[] array = sorted(arraySize);
 
         long t0 = System.nanoTime();
-        search_unsorted(array, key);
+        Boolean found = search_unsorted(array, key);
         long t1 = System.nanoTime();
-        System.out.println(" Search unsorted array Size :" + arraySize + "| Time In ns: " + (t1 - t0));
+        System.out.println(" Search unsorted array size :" + arraySize + "| Time In ns: " + (t1 - t0) + "| Found: "+found);
 
         t0 = System.nanoTime();
-        search_sorted(array, key);
+        found =search_sorted(array, key);
         t1 = System.nanoTime();
-        System.out.println(" Search sorted array Size :" + arraySize + "| Time In ns: " + (t1 - t0));
+        System.out.println(" Search sorted array size :" + arraySize + "| Time In ns: " + (t1 - t0)+ "| Found: "+found);
 
         t0 = System.nanoTime();
-        binary_search_sorted(array, key);
+        found =binary_search_sorted(array, key);
         t1 = System.nanoTime();
-        System.out.println(" Binary search array Size :" + arraySize + "| Time In ns: " + (t1 - t0));
-
+        System.out.println(" Binary search array size :" + arraySize + "| Time In ns: " + (t1 - t0)+ "| Found: "+found);
     }
 
-    public static void benchmarkFindDuplicates() {
+    public static void benchmarkFindDuplicates(int arraySize) {
+
+        Random rnd = new Random();
+        int key = rnd.nextInt(5*arraySize) + 1;
+
+        System.out.println("Current Key :" + key);
+
+        System.out.println("Current Size :" + arraySize);
+        int[] array = sorted(arraySize);
+        int[] array2 = sorted(arraySize);
+
+
+        long t0 = System.nanoTime();
+        Boolean found = binary_find_duplicate_sorted(array, array2);
+        long t1 = System.nanoTime();
+        System.out.println(" Binary find duplicate array size :" + arraySize + "| Time In ns: " + (t1 - t0) + "| Found: "+found);
+
+        t0 = System.nanoTime();
+        found =semiLinear_find_duplicate_sorted(array, array2);
+        t1 = System.nanoTime();
+        System.out.println(" Semi Linear find duplicate array size :" + arraySize + "| Time In ns: " + (t1 - t0)+ "| Found: "+found);
+
+        t0 = System.nanoTime();
+        int numberFound =linear_find_duplicate_unsorted(array, array2);
+        t1 = System.nanoTime();
+        System.out.println(" Linear find duplicate array size :" + arraySize + "| Time In ns: " + (t1 - t0)+ "| Number found: "+numberFound);
+
     }
 
     private static int[] sorted(int n) {
@@ -86,33 +103,27 @@ public class App {
     public static boolean binary_search_sorted(int[] array, int key) {
         int first = 0;
         int last = array.length - 1;
-        boolean foundDuplicate=false;
-        while (foundDuplicate==false) {
+        while (true) {
             // jump to the middle
             int index = (first + last) / 2;
-            System.out.println("Current Index: " + index);
-            System.out.println("Current Value: " + array[index]);
-            System.out.println("Current Key: " + array[index]);
-
             if (array[index] == key) {
-                foundDuplicate=true;
-            } else if (array[index] < key && index < last) {
+                return true;
+            }
+            if (array[index] < key && index < last) {
                 // The index position holds something that is less than
                 // what we're looking for, what is the first possible page?
-                first = index;
+                first = index+1;
                 continue;
-            } else if (array[index] > key && index > first) {
+            }
+            if (array[index] > key && index > first) {
                 // The index position holds something that is larger than
                 // what we're looking for, what is the last possible page?
                 last = index;
                 continue;
             }
             // Why do we land here? What should we do?
-            if ((array[index] > key && index == last) || (array[index] < key && index == first)) {
-                return false;
-            }
+            return false;
         }
-        return true;
     }
 
     public static boolean binary_find_duplicate_sorted(int[] firstArray, int[] secondArray) {
@@ -135,7 +146,7 @@ public class App {
     public static boolean semiLinear_find_duplicate_sorted(int[] firstArray, int[] secondArray) {
         int firstIndex = 0;
         int secondIndex = 0;
-        while ((firstIndex < firstArray.length) && (secondIndex < secondArray.length)) {
+        while ((firstIndex < firstArray.length-1) && (secondIndex < secondArray.length-1)) {
             if (firstArray[firstIndex] <= secondArray[secondIndex]) {
                 firstIndex++;
                 if (firstArray[firstIndex] == secondArray[secondIndex]) {
@@ -151,33 +162,23 @@ public class App {
         return false;
     }
 
-    public static int[] linear_find_duplicate_unsorted(int[] firstArray, int[] secondArray) {
+    public static int linear_find_duplicate_unsorted(int[] firstArray, int[] secondArray) {
 
-        int[] duplicates = new int[firstArray.length];
-        int duplicateIndex = 0;
-        boolean alreadyExists = false;
+        int duplicateNumber = 0;
 
         for (int i = 0; i < firstArray.length; i++) {
             for (int j = 0; j < secondArray.length; j++) {
                 if (firstArray[i] == secondArray[j]) {
-                    alreadyExists = false;
-                    for (int k = 0; k < duplicateIndex; k++) {
-                        if (duplicates[k] == firstArray[i]) {
-                            alreadyExists = true;
-                        }
 
-                    }
-                    if (alreadyExists == false) {
-                        duplicates[duplicateIndex] = firstArray[i];
-                        duplicateIndex++;
+                        duplicateNumber++;
                         j = secondArray.length;// Kolla om detta är okej, aka ska det vara flera duplicates eller en per
                                                // nummer
                     }
                 }
             }
-        }
+        
 
-        return duplicates;
+        return duplicateNumber;
 
     }// Fråga om denna ska vara return int antalet lika element, eller return bool
      // för om det finns, lite otydlig formulering i uppgiften
