@@ -3,69 +3,91 @@ import java.util.Random;
 public class App {
     public static void main(String[] args) throws Exception {
         int arraySize = 100;
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 3; i++) {
 
             benchmarkSortedUnsortedArraySize(arraySize);
-                //testBenchmarkSortedUnsortedArraySize(arraySize);
-                //testBenchmarkFindDuplicates(arraySize);
-            
+            // testBenchmarkSortedUnsortedArraySize(arraySize);
+            // testBenchmarkFindDuplicates(arraySize);
+
             arraySize *= 10;
         }
     }
 
+    public static int[] keyArray(int arraySize) {
+        Random rnd = new Random();
+
+        int[] key = new int[1000];
+
+        for (int j = 0; j < key.length; j++) {
+            key[j] = rnd.nextInt(10 * arraySize) + 1;
+        }
+
+        return key;
+
+    }
+
     public static void benchmarkSortedUnsortedArraySize(int arraySize) {
 
-        Random rnd = new Random();
         long[] minimum = new long[3];
-        for (long l : minimum) {
-            l=Long.MAX_VALUE;
+        for (int i = 0; i < minimum.length; i++) {
+            minimum[i] = Long.MAX_VALUE;
         }
         long t0;
         long t1;
         Boolean found = false;
         int[] array = sorted(arraySize);
         int[] minimumKey = new int[3];
+        int[] key = new int[1000];
 
         for (int i = 0; i < 10; i++) {
 
-            int key = rnd.nextInt(10 * arraySize) + 1;
-
             t0 = System.nanoTime();
-            found = search_unsorted(array, key);
+            for (int j = 0; j < 1000; j++) {
+                found = search_unsorted(array, key[i]);
+            }
             t1 = System.nanoTime();
+            System.out.println(t1 - t0);
 
-            if (minimum[0] > (t1 - t0)) {
+            if (minimum[0] > (t1 - t0) && (t1 - t0) > 1) {
                 minimum[0] = (t1 - t0);
-                minimumKey[0] = key;
+                minimumKey[0] = key[i];
             }
 
             t0 = System.nanoTime();
-            found = search_sorted(array, key);
+            for (int j = 0; j < 1000; j++) {
+                found = search_sorted(array, key[i]);
+            }
             t1 = System.nanoTime();
 
             if (minimum[1] > (t1 - t0)) {
                 minimum[1] = (t1 - t0);
-                minimumKey[1] = key;
+                minimumKey[1] = key[i];
             }
 
             t0 = System.nanoTime();
-            found = binary_search_sorted(array, key);
+            for (int j = 0; j < 1000; j++) {
+                found = binary_search_sorted(array, key[i]);
+            }
             t1 = System.nanoTime();
-
 
             if (minimum[2] > (t1 - t0)) {
                 minimum[2] = (t1 - t0);
-                minimumKey[2] = key;
-            }            
+                minimumKey[2] = key[i];
+            }
 
             array = sorted(arraySize);
+            key = keyArray(arraySize);
+
         }
 
-        System.out.println(" Search unsorted array size :" + arraySize + "| Minimum time in ns: " + minimum[0] + "| Found: " + found + "| For Key: " + minimumKey[0]);
+        System.out.println(" Search unsorted array size :" + arraySize + "| Minimum time in ns: " + minimum[0]
+                + "| Found: " + found + "| For Key: " + minimumKey[0]);
 
-        System.out.println(" Search sorted array size :" + arraySize + "| Minimum time in ns: " + minimum[1] + "| Found: " + found + "| For Key: " + minimumKey[1]);
+        System.out.println(" Search sorted array size :" + arraySize + "| Minimum time in ns: " + minimum[1]
+                + "| Found: " + found + "| For Key: " + minimumKey[1]);
 
-        System.out.println(" Binary search array size :" + arraySize + "| Minimum time in ns: " + minimum[2] + "| Found: " + found + "| For Key: " + minimumKey[2]);
+        System.out.println(" Binary search array size :" + arraySize + "| Minimum time in ns: " + minimum[2]
+                + "| Found: " + found + "| For Key: " + minimumKey[2]);
     }
 
     public static void testBenchmarkSortedUnsortedArraySize(int arraySize) {
