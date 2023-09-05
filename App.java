@@ -2,21 +2,75 @@ import java.util.Random;
 
 public class App {
     public static void main(String[] args) throws Exception {
-        int arraySize = 10;
-        for (int i = 0; i < 3; i++) {
+        int arraySize = 100;
+        for (int i = 0; i < 4; i++) {
 
-            for (int j = 0; j < 1000; j++) {
-                
-        benchmarkSortedUnsortedArraySize(arraySize);
-        benchmarkFindDuplicates(arraySize);
-            }
-        arraySize*=10;
+            benchmarkSortedUnsortedArraySize(arraySize);
+                //testBenchmarkSortedUnsortedArraySize(arraySize);
+                //testBenchmarkFindDuplicates(arraySize);
+            
+            arraySize *= 10;
         }
     }
 
     public static void benchmarkSortedUnsortedArraySize(int arraySize) {
+
         Random rnd = new Random();
-        int key = rnd.nextInt(5*arraySize) + 1;
+        long[] minimum = new long[3];
+        for (long l : minimum) {
+            l=Long.MAX_VALUE;
+        }
+        long t0;
+        long t1;
+        Boolean found = false;
+        int[] array = sorted(arraySize);
+        int[] minimumKey = new int[3];
+
+        for (int i = 0; i < 10; i++) {
+
+            int key = rnd.nextInt(10 * arraySize) + 1;
+
+            t0 = System.nanoTime();
+            found = search_unsorted(array, key);
+            t1 = System.nanoTime();
+
+            if (minimum[0] > (t1 - t0)) {
+                minimum[0] = (t1 - t0);
+                minimumKey[0] = key;
+            }
+
+            t0 = System.nanoTime();
+            found = search_sorted(array, key);
+            t1 = System.nanoTime();
+
+            if (minimum[1] > (t1 - t0)) {
+                minimum[1] = (t1 - t0);
+                minimumKey[1] = key;
+            }
+
+            t0 = System.nanoTime();
+            found = binary_search_sorted(array, key);
+            t1 = System.nanoTime();
+
+
+            if (minimum[2] > (t1 - t0)) {
+                minimum[2] = (t1 - t0);
+                minimumKey[2] = key;
+            }            
+
+            array = sorted(arraySize);
+        }
+
+        System.out.println(" Search unsorted array size :" + arraySize + "| Minimum time in ns: " + minimum[0] + "| Found: " + found + "| For Key: " + minimumKey[0]);
+
+        System.out.println(" Search sorted array size :" + arraySize + "| Minimum time in ns: " + minimum[1] + "| Found: " + found + "| For Key: " + minimumKey[1]);
+
+        System.out.println(" Binary search array size :" + arraySize + "| Minimum time in ns: " + minimum[2] + "| Found: " + found + "| For Key: " + minimumKey[2]);
+    }
+
+    public static void testBenchmarkSortedUnsortedArraySize(int arraySize) {
+        Random rnd = new Random();
+        int key = rnd.nextInt(5 * arraySize) + 1;
 
         System.out.println("Current Key :" + key);
 
@@ -26,23 +80,26 @@ public class App {
         long t0 = System.nanoTime();
         Boolean found = search_unsorted(array, key);
         long t1 = System.nanoTime();
-        System.out.println(" Search unsorted array size :" + arraySize + "| Time In ns: " + (t1 - t0) + "| Found: "+found);
+        System.out.println(
+                " Search unsorted array size :" + arraySize + "| Time In ns: " + (t1 - t0) + "| Found: " + found);
 
         t0 = System.nanoTime();
-        found =search_sorted(array, key);
+        found = search_sorted(array, key);
         t1 = System.nanoTime();
-        System.out.println(" Search sorted array size :" + arraySize + "| Time In ns: " + (t1 - t0)+ "| Found: "+found);
+        System.out.println(
+                " Search sorted array size :" + arraySize + "| Time In ns: " + (t1 - t0) + "| Found: " + found);
 
         t0 = System.nanoTime();
-        found =binary_search_sorted(array, key);
+        found = binary_search_sorted(array, key);
         t1 = System.nanoTime();
-        System.out.println(" Binary search array size :" + arraySize + "| Time In ns: " + (t1 - t0)+ "| Found: "+found);
+        System.out.println(
+                " Binary search array size :" + arraySize + "| Time In ns: " + (t1 - t0) + "| Found: " + found);
     }
 
-    public static void benchmarkFindDuplicates(int arraySize) {
+    public static void testBenchmarkFindDuplicates(int arraySize) {
 
         Random rnd = new Random();
-        int key = rnd.nextInt(5*arraySize) + 1;
+        int key = rnd.nextInt(5 * arraySize) + 1;
 
         System.out.println("Current Key :" + key);
 
@@ -50,21 +107,23 @@ public class App {
         int[] array = sorted(arraySize);
         int[] array2 = sorted(arraySize);
 
-
         long t0 = System.nanoTime();
         Boolean found = binary_find_duplicate_sorted(array, array2);
         long t1 = System.nanoTime();
-        System.out.println(" Binary find duplicate array size :" + arraySize + "| Time In ns: " + (t1 - t0) + "| Found: "+found);
+        System.out.println(
+                " Binary find duplicate array size :" + arraySize + "| Time In ns: " + (t1 - t0) + "| Found: " + found);
 
         t0 = System.nanoTime();
-        found =semiLinear_find_duplicate_sorted(array, array2);
+        found = semiLinear_find_duplicate_sorted(array, array2);
         t1 = System.nanoTime();
-        System.out.println(" Semi Linear find duplicate array size :" + arraySize + "| Time In ns: " + (t1 - t0)+ "| Found: "+found);
+        System.out.println(" Semi Linear find duplicate array size :" + arraySize + "| Time In ns: " + (t1 - t0)
+                + "| Found: " + found);
 
         t0 = System.nanoTime();
-        int numberFound =linear_find_duplicate_unsorted(array, array2);
+        int numberFound = linear_find_duplicate_unsorted(array, array2);
         t1 = System.nanoTime();
-        System.out.println(" Linear find duplicate array size :" + arraySize + "| Time In ns: " + (t1 - t0)+ "| Number found: "+numberFound);
+        System.out.println(" Linear find duplicate array size :" + arraySize + "| Time In ns: " + (t1 - t0)
+                + "| Number found: " + numberFound);
 
     }
 
@@ -112,13 +171,13 @@ public class App {
             if (array[index] < key && index < last) {
                 // The index position holds something that is less than
                 // what we're looking for, what is the first possible page?
-                first = index+1;
+                first = index + 1;
                 continue;
             }
             if (array[index] > key && index > first) {
                 // The index position holds something that is larger than
                 // what we're looking for, what is the last possible page?
-                last = index;
+                last = index - 1;
                 continue;
             }
             // Why do we land here? What should we do?
@@ -146,7 +205,7 @@ public class App {
     public static boolean semiLinear_find_duplicate_sorted(int[] firstArray, int[] secondArray) {
         int firstIndex = 0;
         int secondIndex = 0;
-        while ((firstIndex < firstArray.length-1) && (secondIndex < secondArray.length-1)) {
+        while ((firstIndex < firstArray.length - 1) && (secondIndex < secondArray.length - 1)) {
             if (firstArray[firstIndex] <= secondArray[secondIndex]) {
                 firstIndex++;
                 if (firstArray[firstIndex] == secondArray[secondIndex]) {
@@ -170,13 +229,12 @@ public class App {
             for (int j = 0; j < secondArray.length; j++) {
                 if (firstArray[i] == secondArray[j]) {
 
-                        duplicateNumber++;
-                        j = secondArray.length;// Kolla om detta är okej, aka ska det vara flera duplicates eller en per
-                                               // nummer
-                    }
+                    duplicateNumber++;
+                    j = secondArray.length;// Kolla om detta är okej, aka ska det vara flera duplicates eller en per
+                                           // nummer
                 }
             }
-        
+        }
 
         return duplicateNumber;
 
