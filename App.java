@@ -2,20 +2,20 @@ import java.util.Random;
 
 public class App {
     public static void main(String[] args) throws Exception {
-        int arraySize = 100;
-        for (int i = 0; i < 3; i++) {
+        int[] arraySize = {100,200,500,750,1000,1500};
+        //int[] arraySize = {100,500,1000,5000,10000,25000};
 
+        for (int i : arraySize) {
+            
             System.out.println("");
 
-            // testBenchmarkSortedUnsortedArraySize(arraySize);
-            // benchmarkSortedUnsortedArraySize(arraySize);
+            // testBenchmarkSortedUnsortedArraySize(i);
+            // benchmarkSortedUnsortedArraySize(i);
 
-            // testBenchmarkFindDuplicates(arraySize);
-            benchmarkFindDuplicates(arraySize);
+            // testBenchmarkFindDuplicates(i);
+            benchmarkFindDuplicates(i);
 
             System.out.println("");
-
-            arraySize += 50;
         }
     }
 
@@ -104,15 +104,16 @@ public class App {
         long t1;
         int[] array = sorted(arraySize);
         int[] array2 = sorted(arraySize);
+        int[] array3 = sorted(arraySize);
         int[] numberFoundTotal = new int[3];
         int numberFound = 0;
 
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 1000; i++) {
 
             t0 = System.nanoTime();
-            for (int j = 0; j < 1000; j++) {
-                numberFound += binary_find_duplicate_sorted(array, array2);
-            }
+            numberFound += binary_find_duplicate_sorted(array, array2);
+            numberFound += binary_find_duplicate_sorted(array, array3);
+            numberFound += binary_find_duplicate_sorted(array2, array3);
             t1 = System.nanoTime();
 
             if (minimum[0] > (t1 - t0) && (t1 - t0) > 1) {
@@ -122,9 +123,10 @@ public class App {
             numberFound = 0;
 
             t0 = System.nanoTime();
-            for (int j = 0; j < 1000; j++) {
-                numberFound += semiLinear_find_duplicate_sorted(array, array2);
-            }
+            numberFound += semiLinear_find_duplicate_sorted(array, array2);
+            numberFound += semiLinear_find_duplicate_sorted(array, array3);
+            numberFound += semiLinear_find_duplicate_sorted(array2, array3);
+            
             t1 = System.nanoTime();
 
             if (minimum[1] > (t1 - t0)) {
@@ -134,9 +136,10 @@ public class App {
             numberFound = 0;
 
             t0 = System.nanoTime();
-            for (int j = 0; j < 1000; j++) {
-                numberFound += linear_find_duplicate_unsorted(array, array2);
-            }
+            numberFound += linear_find_duplicate_unsorted(array, array2);
+            numberFound += linear_find_duplicate_unsorted(array, array3);
+            numberFound += linear_find_duplicate_unsorted(array2, array3);
+            
             t1 = System.nanoTime();
 
             if (minimum[2] > (t1 - t0)) {
@@ -146,6 +149,7 @@ public class App {
             numberFound = 0;
             array = sorted(arraySize);
             array2 = sorted(arraySize);
+            array3 = sorted(arraySize);
         }
 
         System.out.println(
