@@ -44,7 +44,7 @@ public class App {
         int[] array = sorted(arraySize);
         int[] key = keyArray(1000);
 
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 1000; i++) {
 
             t0 = System.nanoTime();
             for (int j = 0; j < 1000; j++) {
